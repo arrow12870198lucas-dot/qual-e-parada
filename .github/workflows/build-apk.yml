@@ -13,7 +13,7 @@ jobs:
 
       - name: Extrair projeto
         run: |
-          unzip -o qual-e-parada-android-v1.zip
+          unzip -o qual-e-parada-android-v2.zip
           cd qual-e-parada-android
           echo "PROJECT_DIR=$PWD" >> $GITHUB_ENV
 
