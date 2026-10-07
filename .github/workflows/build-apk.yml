@@ -11,9 +11,9 @@ jobs:
       - name: Baixar projeto
         uses: actions/checkout@v4
 
-      - name: Extrair projeto
+      -       - name: Extrair projeto
         run: |
-        rm -rf qual-e-parada-android
+          rm -rf qual-e-parada-android
           unzip -o qual-e-parada-android-v5.zip
           cd qual-e-parada-android
           echo "PROJECT_DIR=$PWD" >> $GITHUB_ENV
