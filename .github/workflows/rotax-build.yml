@@ -1,0 +1,55 @@
+name: Gerar APK RotaX v1.7
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar arquivos do repositorio
+        uses: actions/checkout@v4
+
+      - name: Extrair exatamente o projeto RotaX v1.7
+        shell: bash
+        run: |
+          set -e
+          ZIP="$(find . -maxdepth 3 -type f -name 'RotaX-v1.7-projeto.zip' | head -n 1)"
+          if [ -z "$ZIP" ]; then
+            echo "ERRO: RotaX-v1.7-projeto.zip nao foi encontrado no repositorio."
+            exit 1
+          fi
+          echo "Usando: $ZIP"
+          rm -rf /tmp/rotax-src
+          mkdir -p /tmp/rotax-src
+          unzip -q -o "$ZIP" -d /tmp/rotax-src
+          ROOT="$(find /tmp/rotax-src -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs -r dirname)"
+          if [ -z "$ROOT" ]; then
+            echo "ERRO: projeto Android nao encontrado dentro do ZIP."
+            exit 1
+          fi
+          cp -a "$ROOT"/. ./
+          test -f app/build.gradle
+          test -f app/src/main/assets/index.html
+          echo "Projeto RotaX v1.7 pronto para compilacao."
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Limpar e compilar APK
+        run: gradle clean assembleDebug
+
+      - name: Renomear APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/RotaX-v1.7.apk
+
+      - name: Disponibilizar APK RotaX
+        uses: actions/upload-artifact@v4
+        with:
+          name: RotaX-v1.7-APK
+          path: app/build/outputs/apk/debug/RotaX-v1.7.apk
